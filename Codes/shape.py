@@ -111,8 +111,8 @@ def myShapeCompute(objet, stats):
     pseudorect = aire/ ( stats[2]* stats[3])
     moments = cv2.moments(objet) 
     hu_moments = cv2.HuMoments(moments)
-    for i in range(0, 7):
-        hu_moments[i] = -1* np.sign(hu_moments[i]) * np.log(abs(hu_moments[i]))
+    #for i in range(0, 7):
+      #  hu_moments[i] = -1* np.sign(hu_moments[i]) * np.log(abs(hu_moments[i]))
     print("MOMENTS")
     print("mu20 :", moments['mu20'])
     print("mu11 :", moments['mu11'])
@@ -131,7 +131,7 @@ def myShapeCompute(objet, stats):
     
     freeman_code=myFreemanCode(objet)
     perimetre= myPerimeter(freeman_code)
-    compacite = (perimetre**2) / aire  # Compacité: périmètre² / aire (minimale pour un cercle)
+    compacite = 4*np.pi*aire/(perimetre**2)
     sig=mySignature(objet)
 
     S.append(aire)

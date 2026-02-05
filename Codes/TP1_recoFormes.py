@@ -105,12 +105,12 @@ def myHuMomentsAnalysis(param_test, param_ex):
         for j in range(nb_ex):
             hu_ex = param_ex[j][6]  # Moments de Hu de l'exemple
             # Calculer la distance euclidienne entre les vecteurs de moments de Hu
-            dist = np.linalg.norm(hu_test - hu_ex)
+            dist = np.linalg.norm(hu_ex-hu_test)
             
             if dist < min_dist:
                 min_dist = dist
                 best_match = j
-        
+            
         prediction[i] = best_match
         
         # Vérifier si la prédiction est correcte
@@ -188,7 +188,7 @@ def mySignatureAnalysis(param_test):
             TP+=1
     
     print("SIGNATURE :")       
-    print("prediction \t:\t", prediction)
+    print("prediction :\t", prediction)
     print("ground truth :\t", ground_truth) 
     print("Accuracy:",   TP/(len(prediction)))
 

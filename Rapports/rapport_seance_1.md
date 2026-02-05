@@ -111,19 +111,19 @@ def myPerimeter(freeman_code):
 
 La compacité est un descripteur de forme défini par :
 
-$$\text{Compacité} = \frac{P^2}{A}$$
+$$\text{Compacité} = \frac{4*π*Aire}{p^2}$$
 
 où P = périmètre et A = aire.
 
-**Propriété :** La compacité est minimale pour un cercle (≈ 4π ≈ 12.57) et augmente pour les formes allongées ou irrégulières.
+**Propriété :** La compacité est très proche de 1 pour un cercle et diminue pour les formes allongées ou irrégulières.
 
 ```python
-compacite = (perimetre**2) / aire
+compacite = 4*np.pi*aire/(perimetre**2) 
 ```
 
 **Vérification pour un cercle :**
-- Cercle parfait : $C = \frac{(2\pi r)^2}{\pi r^2} = 4\pi \approx 12.57$
-- Dans nos résultats : compacité des cercles ≈ 13.4-13.9 (légère pixellisation)
+- Cercle parfait : $C = \frac{(2\pi r)^2}{\pi r^2} = 4\pi \approx 0.91$
+- Dans nos résultats : compacité des cercles ≈ 0.93-0.91  (légère pixellisation)
 
 ### 1.4. Fonction complète `myShapeCompute`
 
@@ -140,13 +140,11 @@ def myShapeCompute(objet, stats):
     # Moments et moments de Hu
     moments = cv2.moments(objet)
     hu_moments = cv2.HuMoments(moments)
-    for i in range(0, 7):
-        hu_moments[i] = -1 * np.sign(hu_moments[i]) * np.log(abs(hu_moments[i]))
     
     # Périmètre et compacité
     freeman_code = myFreemanCode(objet)
     perimetre = myPerimeter(freeman_code)
-    compacite = (perimetre**2) / aire
+    compacite = 4*np.pi*aire/(perimetre**2) 
     
     # Signature
     sig = mySignature(objet)
@@ -221,26 +219,21 @@ Accuracy      : 68.2%
 ```
 
 **Valeurs de compacité observées :**
-- **Cercles** : 13.4 - 13.9 (proche de 4π)
-- **Octogones** : 13.2 - 13.7 (très proche des cercles)
-- **Carrés** : 15.3 - 18.3
-- **Triangles** : 23.3 - 23.6 (formes angulaires)
-- **Rectangles** : 22.1 - 24.5 (formes allongées)
+- **Cercles** : < 0.90
+- **Octogones** : < 0.94 (très proche des cercles)
+- **Carrés** : < 0.56
+- **Triangles** : < 0.50 
+- **Rectangles** : < 0.70 
 
 ### 2.4. Commentaires
 
 **Points positifs :**
-- ✅ Bonne séparation entre formes arrondies (cercle/octogone) et formes angulaires (triangle/rectangle)
-- ✅ Triangles très bien reconnus (compacité élevée distinctive)
-- ✅ Méthode simple et rapide
+
+-  Triangles très bien reconnus (compacité élevée la plus basse)
 
 **Limites observées :**
-- ⚠️ **Confusion cercle ↔ octogone** : compacités très proches (~13), les octogones réguliers sont presque circulaires
-- ⚠️ **Confusion carré ↔ rectangle** : difficile de les différencier uniquement par compacité
-- ⚠️ La compacité est sensible à la pixellisation et au bruit du contour
-
-**Performance :** 68.2% - La meilleure des trois méthodes testées.
-
+-  **Confusion cercle ↔ octogone** : compacités très proches (~0.90-0.95)
+-  **Confusion carré ↔ rectangle** : même chose que pour certain rectangle / carré
 ---
 
 ## Question 3 : Fonction `myHuMomentsAnalysis` - Classification par moments de Hu
@@ -253,8 +246,6 @@ Les moments de Hu sont 7 invariants calculés à partir des moments centraux, in
 - Changement d'échelle
 
 Classification par plus proche voisin dans l'espace des moments de Hu (distance euclidienne).
-
-### 3.2. Implémentation
 
 ### 3.2. Implémentation
 
@@ -292,30 +283,25 @@ def myHuMomentsAnalysis(param_test, param_ex):
 
 ### 3.3. Résultats
 
-```
-MOMENTS DE HU :
-prediction    : [2 1 0 1 3 2 0 3 1 3 4 2 0 0 1 2 1 1 0 3 3 2]
-ground truth  : [2 2 2 4 4 4 4 4 0 3 3 3 3 1 1 1 1 1 2 5 0 0]
-Accuracy      : 22.7%
-```
+MOMENT DE HU :
+prediction   :   [2 3 2 4 4 4 1 4 0 3 3 3 3 4 1 1 1 1 2 2 0 0]
+ground truth :   [2 2 2 4 4 4 4 4 0 3 3 3 3 1 1 1 1 1 2 5 0 0]
+Accuracy: 0.8181818181818182
 
 ### 3.4. Commentaires
 
-**Performance très faible : 22.7%**
+**Performance élevée  : 82%**
 
 **Observations :**
-- ❌ Nombreuses confusions entre toutes les catégories
-- ❌ Les moments de Hu semblent trop sensibles aux variations mineures
-- ❌ Peu discriminants pour des formes géométriques simples
 
-**Explications possibles :**
-1. **Sensibilité au bruit** : Petites variations de contour amplifient les différences
-2. **Trop d'invariance** : L'invariance rotation peut masquer des différences importantes
-3. **Inadapté aux formes simples** : Les moments de Hu sont plus adaptés aux formes complexes ou organiques
-4. **Problème de normalisation** : Les échelles des 7 moments sont très différentes
+**Points positifs :**
 
-**Amélioration possible** : Normaliser ou pondérer différemment les 7 moments, ou utiliser seulement certains moments plus discriminants.
+- Les écart entre chaque moments de Hu des différentes formes sont très grand
+- peu importe le sens de la forme et la taille 
 
+**Limites observées :**
+
+- besoin d'image de référence 
 ---
 
 ## Question 4 : Fonction `mySignatureAnalysis` - Classification par signature
@@ -425,31 +411,24 @@ Accuracy      : 63.6%
 **Performance moyenne : 63.6%**
 
 **Points positifs :**
-- ✅ **Triangles parfaitement détectés** (3 pics nets)
-- ✅ Méthode intuitive et interprétable géométriquement
-- ✅ Octogones bien identifiés grâce aux 8 sommets
-
+-  **Triangles parfaitement détectés** (3 pics nets)
+-  Méthode intuitive et interprétable géométriquement
+- Pas besoin d'image de référence
 **Limites observées :**
-- ⚠️ **Confusion carré ↔ rectangle** : même nombre de maxima (4), la variance seule ne suffit pas toujours
-- ⚠️ **Cercles mal classés** : certains identifiés comme "autre" ou "carré" à cause du bruit
-- ⚠️ **Sensibilité au filtrage** : le paramètre σ influence fortement le nombre de maxima détectés
-- ⚠️ Pixellisation crée des irrégularités dans la signature
+-  **Confusion carré ↔ rectangle** : même nombre de maxima (4), la variance seule ne suffit pas toujours
+-  **Cercles mal classés** : certains identifiés comme "autre" ou "carré" à cause du bruit
 
 **Améliorations possibles :**
-1. Ajuster le paramètre de filtrage gaussien (σ)
-2. Utiliser le rapport hauteur/largeur pour différencier carré/rectangle
-3. Analyser l'amplitude des maxima, pas seulement leur nombre
-4. Combiner avec d'autres descripteurs (compacité, moments)
-
+Analyser l'amplitude des maxima, pas seulement leur nombre
 ---
 
 ## Synthèse comparative des méthodes
 
 | Méthode | Accuracy | Avantages | Inconvénients |
 |---------|----------|-----------|---------------|
-| **Compacité** | **68.2%** | ✅ Simple et rapide<br>✅ Bon pour formes régulières<br>✅ Interprétable | ⚠️ Confusion cercle/octogone<br>⚠️ Confusion carré/rectangle |
-| **Moments de Hu** | **22.7%** | ✅ Invariants théoriques robustes<br>✅ Applicable formes complexes | ❌ Peu discriminant formes simples<br>❌ Sensible au bruit<br>❌ Difficile à interpréter |
-| **Signature** | **63.6%** | ✅ Intuitive géométriquement<br>✅ Excellente pour triangles<br>✅ Détecte le nb de sommets | ⚠️ Sensible au filtrage<br>⚠️ Confusion 4 côtés<br>⚠️ Pixellisation |
+| **Compacité** | **68.2%** | Simple et rapide<br>Bon pour formes régulières<br> Interprétable | Confusion cercle/octogone<br> Confusion carré/rectangle |
+| **Moments de Hu** | **82%** | Fait la différence entre   | Besoin d'image de référence<br>|
+| **Signature** | **63.6%** |  Intuitive géométriquement<br> Excellente pour triangles<br> Détecte le nb de sommets |  Sensible au filtrage<br> Confusion 4 côtés<br> Pixellisation |
 
 ---
 
@@ -472,3 +451,4 @@ Le TP a permis d'implémenter avec succès trois méthodes de reconnaissance de 
 2. **Descripteurs additionnels** : rapport hauteur/largeur, circularité
 3. **Apprentissage supervisé** : SVM ou k-NN sur l'ensemble des descripteurs
 4. **Plus d'exemples** : 5 exemples par classe sont insuffisants pour capturer la variabilité
+
