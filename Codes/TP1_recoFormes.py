@@ -190,7 +190,7 @@ def mySignatureAnalysis(param_test):
             TP+=1
     
     print("SIGNATURE :")       
-    print("prediction \t:\t", prediction)
+    print("prediction :\t", prediction)
     print("ground truth :\t", ground_truth) 
     print("Accuracy:",   TP/(len(prediction)))
 
