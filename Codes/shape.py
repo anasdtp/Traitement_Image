@@ -35,13 +35,30 @@ def mySignature(objet):
         distance = np.sqrt((x - ch)**2 + (y - cw)**2)
         signature.append(distance)
     
+    # Plot l'objet et les points
+    # plt.figure(figsize=(10, 5))
+    # plt.subplot(1, 2, 1)
+    # plt.plot(objet)
+    # plt.legend()
+    # plt.axis('equal')
+    
+    # plt.subplot(1, 2, 2)
+    # plt.plot(signature)
+    # plt.title('Signature (distance au centre)')
+    # plt.xlabel('Point du contour')
+    # plt.ylabel('Distance')
+    # plt.tight_layout()
+    # plt.show()
+    
     return(signature)
 
 
 """Codage de Freeman 
 Input : objet, image binaire contenant une composante connexe
 """
-Freeman =np.array( [[3, 2, 1], [4, -1, 0], [5, 6, 7]] )
+Freeman =np.array( [[3, 2, 1], 
+                    [4, -1, 0], 
+                    [5, 6, 7]] )
 
 def myFreemanCode(objet):
     contour,_ = cv2.findContours(objet,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
@@ -108,11 +125,11 @@ def myShapeCompute(objet, stats):
     S=[] # parametres de forme
     aire = stats[4]  # L'aire est disponible dans stats[4] (cv2.CC_STAT_AREA)
     print("AIRE :", aire)
-    pseudorect = aire/ ( stats[2]* stats[3])
-    moments = cv2.moments(objet) 
-    hu_moments = cv2.HuMoments(moments)
-    for i in range(0, 7):
-        hu_moments[i] = -1* np.sign(hu_moments[i]) * np.log(abs(hu_moments[i]))
+    pseudorect = aire/ ( stats[2]* stats[3]) # Pseudo-rectangularité : aire / (largeur * hauteur)
+    moments = cv2.moments(objet) # Moments géométriques : m00, m10, m01, m20, m11, m02, etc. (invariants à la translation)
+    hu_moments = cv2.HuMoments(moments) # Moments de Hu : invariants à la translation, rotation et échelle
+    # for i in range(0, 7):
+    #     hu_moments[i] = -1* np.sign(hu_moments[i]) * np.log(abs(hu_moments[i]))# Transformation logarithmique pour une meilleure interprétation des moments de Hu
     print("MOMENTS")
     print("mu20 :", moments['mu20'])
     print("mu11 :", moments['mu11'])
@@ -131,7 +148,7 @@ def myShapeCompute(objet, stats):
     
     freeman_code=myFreemanCode(objet)
     perimetre= myPerimeter(freeman_code)
-    compacite = (perimetre**2) / aire  # Compacité: périmètre² / aire (minimale pour un cercle)
+    compacite = 4*np.pi*aire/(perimetre**2) # Compacité: 4*pi*aire / périmètre² (maximale pour un cercle)
     sig=mySignature(objet)
 
     S.append(aire)
