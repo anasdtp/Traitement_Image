@@ -126,10 +126,10 @@ def myHuMomentsAnalysis(param_test, param_ex):
     
 
 """ 
-mySignatureAnalysis 
+mySignatureAnalysis
 Input : param_test, liste des paramètres de forme calculés sur les objets à reconnaitre
-Recherche les max locaux de la signature 
-Analyse des max locaux pour déterminer le type de forme 
+Recherche les max locaux de la signature
+Analyse des max locaux pour déterminer le type de forme
 """
 def mySignatureAnalysis(param_test):
     nb_objets=len(param_test)
@@ -157,34 +157,31 @@ def mySignatureAnalysis(param_test):
         maxima = argrelextrema(signature, np.greater)[0]
         nb_maxima = len(maxima)
         
-        # Cercle : peu de maxima (signature régulière)
-        if nb_maxima <= 2:
-            prediction[i] = CERCLE
         # Triangle : 3 maxima
+        if (np.std(signature)/np.mean(signature)) < 0.02:
+            prediction[i] = CERCLE
         elif nb_maxima == 3:
             prediction[i] = TRIANGLE
+            print(f"Image {i} : triangle détecté, nombre de maxima = {nb_maxima}, moyenne des maxima = {np.mean(maxima)}, ecart type des maxima = {np.max(maxima)/np.min(maxima)}")
         # Carré : 4 maxima
         elif nb_maxima == 4:
             # Vérifier si c'est un carré ou un rectangle
             # En analysant la variance des distances entre maxima
-            if nb_maxima == 4:
-                distances = []
-                for k in range(nb_maxima):
-                    dist = signature[maxima[k]]
-                    distances.append(dist)
-                variance = np.var(distances)
-                # Si variance faible = carré, sinon rectangle
-                print(f"Image {i} - Variance : {variance}, Distance moy : {np.mean(distances)}")
-                if variance < (np.mean(distances)/15000.0):
-                    prediction[i] = CARRE
-                else:
-                    prediction[i] = RECTANGLE
+            ecart_type = np.max(maxima)/np.min(maxima)
+            if ecart_type < 6: # Seuil à ajuster pour différencier carré et rectangle
+                prediction[i] = RECTANGLE
+                print(f"Image {i} : rectangle détecté, nombre de maxima = {nb_maxima}, moyenne des maxima = {np.mean(maxima)}, ecalrt type des maxima = {np.max(maxima)/np.min(maxima)}")
+            else:
+                prediction[i] = CARRE 
+                print(f"Image {i} : carré détecté, nombre de maxima = {nb_maxima}, moyenne des maxima = {np.mean(maxima)}, ecart type des maxima = {np.max(maxima)/np.min(maxima)}")  
         # Octogone : 8 maxima
         elif nb_maxima >= 7 and nb_maxima <= 9:
             prediction[i] = OCTOGONE
+            print(f"Image {i} : octogone détecté, nombre de maxima = {nb_maxima}, moyenne des maxima = {np.mean(maxima)}, ecart type des maxima = {np.max(maxima)/np.min(maxima)}")
         # Autre
         else:
             prediction[i] = AUTRE
+            print(f"Image {i} : forme non reconnue, nombre de maxima = {nb_maxima}, moyenne des maxima = {np.mean(maxima)}, ecart type des maxima = {np.max(maxima)/np.min(maxima)}, std/mean signature = {np.std(signature)/np.mean(signature)}")
 
         if(prediction[i]==ground_truth[i]):
             TP+=1
