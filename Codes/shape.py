@@ -124,13 +124,15 @@ En sortie : une liste de parametres
 def myShapeCompute(objet, stats):
     S=[] # parametres de forme
     aire = stats[4]  # L'aire est disponible dans stats[4] (cv2.CC_STAT_AREA)
-    print("AIRE :", aire)
+    #print("AIRE :", aire)
     pseudorect = aire/ ( stats[2]* stats[3]) # Pseudo-rectangularité : aire / (largeur * hauteur)
     moments = cv2.moments(objet) # Moments géométriques : m00, m10, m01, m20, m11, m02, etc. (invariants à la translation)
     hu_moments = cv2.HuMoments(moments) # Moments de Hu : invariants à la translation, rotation et échelle
     # for i in range(0, 7):
     #     hu_moments[i] = -1* np.sign(hu_moments[i]) * np.log(abs(hu_moments[i]))# Transformation logarithmique pour une meilleure interprétation des moments de Hu
-    print("MOMENTS")
+    #print("MOMENTS")
+    
+    """
     print("mu20 :", moments['mu20'])
     print("mu11 :", moments['mu11'])
     print("mu02 :", moments['mu02'])
@@ -145,7 +147,7 @@ def myShapeCompute(objet, stats):
     print("nu21 :", moments['nu21'])
     print("nu12 :", moments['nu12'])    
     print("nu03 :", moments['nu03'])
-    
+    """
     freeman_code=myFreemanCode(objet)
     perimetre= myPerimeter(freeman_code)
     compacite = 4*np.pi*aire/(perimetre**2) # Compacité: 4*pi*aire / périmètre² (maximale pour un cercle)

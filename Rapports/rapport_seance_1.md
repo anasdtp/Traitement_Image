@@ -426,29 +426,18 @@ Analyser l'amplitude des maxima, pas seulement leur nombre
 
 | Méthode | Accuracy | Avantages | Inconvénients |
 |---------|----------|-----------|---------------|
-| **Compacité** | **68.2%** | Simple et rapide<br>Bon pour formes régulières<br> Interprétable | Confusion cercle/octogone<br> Confusion carré/rectangle |
-| **Moments de Hu** | **82%** | Fait la différence entre   | Besoin d'image de référence<br>|
-| **Signature** | **63.6%** |  Intuitive géométriquement<br> Excellente pour triangles<br> Détecte le nb de sommets |  Sensible au filtrage<br> Confusion 4 côtés<br> Pixellisation |
+| **Compacité** | **68%** | Simple et rapide<br>Bon pour formes régulières<br> besoin d'image de référence | Confusion cercle/octogone<br> Confusion carré/rectangle |
+| **Moments de Hu** | **82%** | A compléter  | Besoin d'image de référence<br>|
+| **Signature** | **100 %** |  Pas besoin d'image de référence<br> Intuitive géométriquement<br> Excellente pour triangles<br> Signature des formes propres |  Sensible au filtrage<br> Confusion sur les formes à 4 côtés (ajout d'une méthode de différentiation)<br> Besoin d'un dataset d'image de bonne qualité |
 
 ---
 
 ## Conclusion
 
-Le TP a permis d'implémenter avec succès trois méthodes de reconnaissance de formes géométriques :
+Le TP a permis de découvrir une première approche du traitement d'image et d'analyser différente  méthodes de reconnaissance de formes géométriques :
 
-**Classement des performances :**
-1. 🥇 **Compacité : 68.2%** - Meilleure méthode globalement
-2. 🥈 **Signature : 63.6%** - Bonne performance, très efficace pour les triangles  
-3. 🥉 **Moments de Hu : 22.7%** - Inadaptés aux formes géométriques simples
 
 **Enseignements :**
 - Les descripteurs simples (compacité) sont souvent plus efficaces que les descripteurs complexes (moments de Hu) pour des formes géométriques basiques
 - L'analyse de signature est puissante mais nécessite un bon prétraitement (filtrage)
 - Aucune méthode seule n'atteint une performance parfaite
-
-**Perspectives d'amélioration :**
-1. **Fusion de méthodes** : Vote majoritaire entre les 3 approches
-2. **Descripteurs additionnels** : rapport hauteur/largeur, circularité
-3. **Apprentissage supervisé** : SVM ou k-NN sur l'ensemble des descripteurs
-4. **Plus d'exemples** : 5 exemples par classe sont insuffisants pour capturer la variabilité
-
