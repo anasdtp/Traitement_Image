@@ -35,7 +35,7 @@ Le périmètre se calcule ensuite en sommant les distances : 1 pour les directio
 
 **- en déduire la compacité et vérifier qu'elle est maximale pour les ronds**
 
-La compacité est calculée par : $C = \frac{4\pi A}{P^2}$ où A=aire, P=périmètre.
+La compacité est calculée par : ![alt text](image-1.png) où A=aire, P=périmètre.
 
 Elle est proche de 1 pour un cercle (forme la plus compacte) et diminue pour les formes allongées.
 
@@ -143,10 +143,10 @@ Accuracy : 81.8%
 Les deux formes ont 4 maxima. On les différencie en analysant le **rapport entre maxima** :
 
 - **Carré :** Les 4 distances maximales sont identiques (4 coins équidistants du centre)
-  - $\frac{max(maxima)}{min(maxima)} < 6$
+  - ![alt text](image-2.png)
 
 - **Rectangle :** 2 distances différentes car les coins des côtés longs sont plus éloignés du centre que ceux des côtés courts
-  - $\frac{max(maxima)}{min(maxima)} \geq 6$
+  - ![alt text](image-3.png)
 
 Cette approche fonctionne bien car l'allongement du rectangle crée une différence significative entre les amplitudes des maxima.
 
@@ -154,7 +154,7 @@ Cette approche fonctionne bien car l'allongement du rectangle crée une différe
 
 À cause de la pixelisation, un cercle peut présenter de nombreux petits maxima parasites. Le simple comptage ne suffit pas. On utilise donc l'**écart-type relatif** de la signature :
 
-$$\frac{\sigma_{signature}}{\mu_{signature}} < 0.02$$
+![alt text](image-4.png)
 
 Pour un cercle, même pixellisé, la distance au centre varie très peu (signature quasi-constante). Ce critère permet de distinguer un cercle d'un octogone qui a aussi une signature relativement régulière mais avec 8 variations nettes.
 
@@ -167,7 +167,7 @@ ground truth : [2 2 2 4 4 4 4 4 0 3 3 3 3 1 1 1 1 1 2 5 0 0]
 Accuracy : 100%
 ```
 
-**-** Performance parfaite. Le comptage des maxima permet d'identifier précisément le nombre de sommets. Le filtrage gaussien avec $\sigma = \frac{longueur\_contour}{128}$ élimine bien le bruit de pixellisation. Avantage majeur : pas besoin d'images de référence.
+**-** Performance parfaite. Le comptage des maxima permet d'identifier précisément le nombre de sommets. Le filtrage gaussien avec ![alt text](image-5.png) élimine bien le bruit de pixellisation. Avantage majeur : pas besoin d'images de référence.
 
 ---
 
