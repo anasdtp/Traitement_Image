@@ -81,6 +81,7 @@ Valeurs de compacité observées :
 ### **Calcul des moments de Hu**
 **Dans la fonction myShapeCompute (dans shape.py), rajouter le calcul des moments de Hu (en utilisant les fonctions d'opencv)**
 
+Les moments de Hu ont été ajoutés à la fonction `myShapeCompute`. On utilise d'abord `cv2.moments()` pour obtenir les moments géométriques (invariants à la translation), puis `cv2.HuMoments()` pour calculer les 7 moments de Hu qui sont invariants à la translation, rotation et échelle.
 
 ### **Function myHuMomentsAnalysis(param_test, param_ex)**
 **Compléter la fonction pour qu'elle :**
@@ -175,9 +176,9 @@ Accuracy : 100%
 
 | Méthode | Accuracy | Avantages | Inconvénients |
 |---------|----------|-----------|---------------|
-| **Compacité** | **68%** | Simple et rapide<br>Bon pour formes régulières<br> besoin d'image de référence | Confusion cercle/octogone<br> Confusion carré/rectangle |
-| **Moments de Hu** | **82%** | A compléter  | Besoin d'image de référence<br>|
-| **Signature** | **100 %** |  Pas besoin d'image de référence<br> Intuitive géométriquement<br> Excellente pour triangles<br> Signature des formes propres |  Sensible au filtrage<br> Confusion sur les formes à 4 côtés (ajout d'une méthode de différentiation)<br> Besoin d'un dataset d'image de bonne qualité |
+| **Compacité** | **68%** | Simple et rapide<br>Calcul peu coûteux<br>Bon pour formes régulières | Besoin d'images de référence<br>Confusion cercle/octogone<br>Confusion carré/rectangle |
+| **Moments de Hu** | **82%** | Robustes aux rotations et changements d'échelle<br>Meilleure performance que la compacité<br>Capture bien la géométrie des formes | Besoin d'images de référence<br>Calcul plus complexe<br>Confusions persistent sur certaines formes |
+| **Signature** | **100 %** | Pas besoin d'images de référence<br>Intuitive géométriquement<br>Identification directe du nombre de sommets<br>Performance parfaite sur ce dataset | Sensible au choix du filtrage<br>Nécessite un bon prétraitement<br>Paramètre σ à ajuster selon la taille du contour |
 
 ---
 
