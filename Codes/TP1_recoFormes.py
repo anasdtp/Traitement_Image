@@ -55,7 +55,7 @@ def myCompacityAnalysis(param_test, param_ex):
     # Pour chaque objet à tester
     for i in range(nb_objets):
         comp_test = param_test[i][2]  # Compacité de l'objet à tester (indice 2)
-        compacite.append(round(comp_test, 2))
+        compacite.append(float(round(comp_test, 2)))
         
         # Trouver l'exemple le plus proche en termes de compacité
         min_dist = float('inf')

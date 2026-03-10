@@ -50,8 +50,9 @@ Elle est proche de 1 pour un cercle (forme la plus compacte) et diminue pour les
 ### Résultats
 
 ```
-prediction   : [2 0 2 4 1 1 3 1 0 3 3 3 3 1 4 1 1 1 2 3 0 0]
-ground truth : [2 2 2 4 4 4 4 4 0 3 3 3 3 1 1 1 1 1 2 5 0 0]
+prediction   :    [2 0 2 4 1 1 3 1 0 3 3 3 3 1 4 1 1 1 2 3 0 0]
+ground truth :    [2 2 2 4 4 4 4 4 0 3 3 3 3 1 1 1 1 1 2 5 0 0]
+compacite    :    [0.94, 0.92, 0.94, 0.57, 0.53, 0.29, 0.74, 0.51, 0.91, 0.69, 0.69, 0.69, 0.8, 0.54, 0.57, 0.53, 0.53, 0.54, 0.95, 0.82, 0.91, 0.9]
 Accuracy : 68.2%
 ```
 
@@ -65,7 +66,7 @@ RECTANGLE =4
 AUTRE=5
 ```
 
-Valeurs observées :
+Valeurs de compacité observées :
 - Cercles/Octogones : 0.90-0.95 → confusion fréquente
 - Carrés : ~0.70-0.80
 - Rectangles : ~0.50-0.70  

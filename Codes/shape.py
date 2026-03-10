@@ -36,19 +36,19 @@ def mySignature(objet):
         signature.append(distance)
     
     # Plot l'objet et les points
-    # plt.figure(figsize=(10, 5))
-    # plt.subplot(1, 2, 1)
-    # plt.plot(objet)
-    # plt.legend()
-    # plt.axis('equal')
+    plt.figure(figsize=(10, 5))
+    plt.subplot(1, 2, 1)
+    plt.plot(objet)
+    plt.legend()
+    plt.axis('equal')
     
-    # plt.subplot(1, 2, 2)
-    # plt.plot(signature)
-    # plt.title('Signature (distance au centre)')
-    # plt.xlabel('Point du contour')
-    # plt.ylabel('Distance')
-    # plt.tight_layout()
-    # plt.show()
+    plt.subplot(1, 2, 2)
+    plt.plot(signature)
+    plt.title('Signature (distance au centre)')
+    plt.xlabel('Point du contour')
+    plt.ylabel('Distance')
+    plt.tight_layout()
+    plt.show()
     
     return(signature)
 
