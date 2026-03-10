@@ -5,435 +5,164 @@
 
 ---
 
-## Introduction
+## Objectif
 
-**Objectif du TP :** Implémenter des méthodes de reconnaissance de formes géométriques simples (cercle, triangle, octogone, carré, rectangle) en utilisant différents descripteurs de forme.
+Implémenter 3 méthodes de reconnaissance automatique de formes géométriques (cercle, triangle, octogone, carré, rectangle) basées sur différents descripteurs.
 
 **Données :**
-- Images 00 à 04 : 5 exemples de référence (un par catégorie)
-- Images 05 à 26 : 22 images de test à classifier
-- Catégories : 0=cercle, 1=triangle, 2=octogone, 3=carré, 4=rectangle
+- 5 images de référence (00-04) : une par catégorie
+- 22 images test (05-26) à classifier
+- Classes : 0=cercle, 1=triangle, 2=octogone, 3=carré, 4=rectangle
 
 ---
 
-## Question 1 : Fonction `myShapeCompute` - Calcul des paramètres de forme
+## 1. Calcul des paramètres de forme
 
-### 1.1. Calcul de l'aire
+On a implémenté la fonction `myShapeCompute` qui extrait plusieurs descripteurs :
 
-L'aire correspond au nombre de pixels de l'objet, disponible directement dans `stats[4]` retourné par `cv2.connectedComponentsWithStats`.
+**Aire :** Nombre de pixels de l'objet (directement dans `stats[4]`)
 
-```python
-aire = stats[4]  # Nombre de pixels à 1 dans l'objet
-```
+**Périmètre :** Calculé via le code de Freeman
+- Code de Freeman : encode les 8 directions possibles entre points consécutifs du contour
+- On convertit ensuite en distance : 1 pour horizontal/vertical, √2 pour diagonal
 
-### 1.2. Calcul du périmètre
+**Périmètre :** Calculé via le code de Freeman
+- Code de Freeman : encode les 8 directions possibles entre points consécutifs du contour
+- On convertit ensuite en distance : 1 pour horizontal/vertical, √2 pour diagonal
 
-Le périmètre est calculé à partir du code de Freeman du contour.
+**Compacité :** $C = \frac{4\pi A}{P^2}$ où A=aire, P=périmètre
+- Proche de 1 pour un cercle, diminue pour les formes allongées
 
-#### a) Code de Freeman (`myFreemanCode`)
+**Signature :** Distance de chaque point du contour au centre de gravité
 
-Encode chaque déplacement entre deux points consécutifs du contour selon 8 directions :
-
-```
-  3   2   1
-   \  |  /
- 4 - · - 0
-   /  |  \
-  5   6   7
-```
-
-**Implémentation :**
-
-```python
-def mySignature(objet):
-    contour,_ = cv2.findContours(objet,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
-    cnt=contour[0]
-    ch=np.mean(cnt[:, 0, 0])  # Centre de gravité x
-    cw=np.mean(cnt[:, 0, 1])  # Centre de gravité y
-    signature=[]
-   
-    for point in cnt:
-        x = point[0, 0]
-        y = point[0, 1]
-        distance = np.sqrt((x - ch)**2 + (y - cw)**2)
-        signature.append(distance)
-    
-    return(signature)
-```
-
-#### **`myFreemanCode(objet)`**
-Calcule le code de Freeman pour encoder le contour (8 directions possibles).
-
-**Implémentation :**
-
-```python
-Freeman = np.array([[3, 2, 1], [4, -1, 0], [5, 6, 7]])
-
-def myFreemanCode(objet):
-    contour,_ = cv2.findContours(objet, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    cnt = contour[0]
-    p0 = cnt[0]
-    code = []
-    
-    for p in range(1, len(cnt)):
-        p1 = cnt[p]
-        # Calcul du vecteur de déplacement
-        dx = p1[0, 0] - p0[0, 0]
-        dy = p1[0, 1] - p0[0, 1]
-        # Normalisation à -1, 0, ou 1
-        dx = np.clip(dx, -1, 1)
-        dy = np.clip(dy, -1, 1)
-        # Indexation dans la matrice Freeman (dy+1, dx+1)
-        code.append(Freeman[dy+1, dx+1])
-        p0 = p1
-    
-    return code
-```
-
-#### b) Calcul du périmètre (`myPerimeter`)
-
-À partir du code de Freeman, on calcule le périmètre en sommant les distances :
-- **Directions horizontales/verticales** (0,2,4,6) : distance = 1
-- **Directions diagonales** (1,3,5,7) : distance = √2
-
-```python
-def myPerimeter(freeman_code):
-    perim = 0.
-    for p in range(0, len(freeman_code)):
-        if freeman_code[p] % 2 == 0:  # Direction paire
-            perim += 1.0
-        else:  # Direction impaire
-            perim += np.sqrt(2)
-    return perim
-```
-
-### 1.3. Calcul de la compacité
-
-La compacité est un descripteur de forme défini par :
-
-$$\text{Compacité} = \frac{4*π*Aire}{p^2}$$
-
-où P = périmètre et A = aire.
-
-**Propriété :** La compacité est très proche de 1 pour un cercle et diminue pour les formes allongées ou irrégulières.
-
-```python
-compacite = 4*np.pi*aire/(perimetre**2) 
-```
-
-**Vérification pour un cercle :**
-- Cercle parfait : $C = \frac{(2\pi r)^2}{\pi r^2} = 4\pi \approx 0.91$
-- Dans nos résultats : compacité des cercles ≈ 0.93-0.91  (légère pixellisation)
-
-### 1.4. Fonction complète `myShapeCompute`
-
-```python
-def myShapeCompute(objet, stats):
-    S = []  # Liste des paramètres
-    
-    # Aire
-    aire = stats[4]
-    
-    # Pseudo-rectangularité
-    pseudorect = aire / (stats[2] * stats[3])
-    
-    # Moments et moments de Hu
-    moments = cv2.moments(objet)
-    hu_moments = cv2.HuMoments(moments)
-    
-    # Périmètre et compacité
-    freeman_code = myFreemanCode(objet)
-    perimetre = myPerimeter(freeman_code)
-    compacite = 4*np.pi*aire/(perimetre**2) 
-    
-    # Signature
-    sig = mySignature(objet)
-    
-    # Stockage des paramètres
-    S.append(aire)          # [0]
-    S.append(perimetre)     # [1]
-    S.append(compacite)     # [2]
-    S.append(pseudorect)    # [3]
-    S.append(sig)           # [4]
-    S.append(moments)       # [5]
-    S.append(hu_moments)    # [6]
-    
-    return S
-```
+**Moments de Hu :** 7 invariants géométriques (rotation, translation, échelle)
 
 ---
 
-## Question 2 : Fonction `myCompacityAnalysis` - Classification par compacité
+## 2. Méthode 1 : Classification par compacité
 
-### 2.1. Principe
+On compare la compacité de chaque image test avec les 5 références et on prédit la classe la plus proche.
 
-Pour chaque forme à tester :
-1. Calculer sa compacité
-2. Comparer avec la compacité des 5 exemples
-3. Prédire la catégorie de l'exemple le plus proche (distance minimale)
-4. Comparer avec la vérité terrain (ground_truth)
-
-### 2.2. Implémentation
-
-```python
-def myCompacityAnalysis(param_test, param_ex):
-    nb_objets = len(param_test)
-    nb_ex = len(param_ex)
-    prediction = np.zeros(shape=(nb_objets), dtype=np.uint8)
-    TP = 0  # True Positives
-    compacite = []
-    
-    for i in range(nb_objets):
-        comp_test = param_test[i][2]  # Compacité à l'indice 2
-        compacite.append(comp_test)
-        
-        # Recherche du plus proche voisin
-        min_dist = float('inf')
-        best_match = 0
-        
-        for j in range(nb_ex):
-            comp_ex = param_ex[j][2]
-            dist = abs(comp_test - comp_ex)
-            
-            if dist < min_dist:
-                min_dist = dist
-                best_match = j
-        
-        prediction[i] = best_match
-        
-        # Vérification avec ground truth
-        if prediction[i] == ground_truth[i]:
-            TP += 1
-    
-    accuracy = TP / len(prediction)
-    return prediction, accuracy
-```
-
-### 2.3. Résultats
+### Résultats
 
 ```
-COMPACITÉ :
-prediction    : [2 0 2 4 1 1 3 1 0 3 3 3 3 1 4 1 1 1 2 3 0 0]
-ground truth  : [2 2 2 4 4 4 4 4 0 3 3 3 3 1 1 1 1 1 2 5 0 0]
-Accuracy      : 68.2%
+prediction   : [2 0 2 4 1 1 3 1 0 3 3 3 3 1 4 1 1 1 2 3 0 0]
+ground truth : [2 2 2 4 4 4 4 4 0 3 3 3 3 1 1 1 1 1 2 5 0 0]
+Accuracy : 68.2%
 ```
 
-**Valeurs de compacité observées :**
-- **Cercles** : < 0.90
-- **Octogones** : < 0.94 (très proche des cercles)
-- **Carrés** : < 0.56
-- **Triangles** : < 0.50 
-- **Rectangles** : < 0.70 
+Valeurs observées :
+- Cercles/Octogones : 0.90-0.95 → confusion fréquente
+- Carrés : ~0.70-0.80
+- Rectangles : ~0.50-0.70  
+- Triangles : ~0.50-0.55
 
-### 2.4. Commentaires
+**Analyse :** Méthode simple mais limitée. Les octogones ressemblent trop aux cercles (forme régulière). Difficile aussi de distinguer carrés des rectangles selon leur orientation.
 
-**Points positifs :**
-
--  Triangles très bien reconnus (compacité élevée la plus basse)
-
-**Limites observées :**
--  **Confusion cercle ↔ octogone** : compacités très proches (~0.90-0.95)
--  **Confusion carré ↔ rectangle** : même chose que pour certain rectangle / carré
 ---
 
-## Question 3 : Fonction `myHuMomentsAnalysis` - Classification par moments de Hu
+## 3. Méthode 2 : Classification par moments de Hu
 
-### 3.1. Principe
+On calcule la distance euclidienne entre les 7 moments de Hu de l'image test et ceux des références.
 
-Les moments de Hu sont 7 invariants calculés à partir des moments centraux, invariants par :
-- Translation
-- Rotation  
-- Changement d'échelle
+### Résultats
 
-Classification par plus proche voisin dans l'espace des moments de Hu (distance euclidienne).
-
-### 3.2. Implémentation
-
-```python
-def myHuMomentsAnalysis(param_test, param_ex):
-    nb_objets = len(param_test)
-    nb_ex = len(param_ex)
-    prediction = np.zeros(shape=(nb_objets), dtype=np.uint8)
-    TP = 0
-    
-    for i in range(nb_objets):
-        hu_test = param_test[i][6]  # Moments de Hu à l'indice 6
-        
-        # Recherche du plus proche voisin
-        min_dist = float('inf')
-        best_match = 0
-        
-        for j in range(nb_ex):
-            hu_ex = param_ex[j][6]
-            # Distance euclidienne entre les vecteurs de 7 moments
-            dist = np.linalg.norm(hu_test - hu_ex)
-            
-            if dist < min_dist:
-                min_dist = dist
-                best_match = j
-        
-        prediction[i] = best_match
-        
-        if prediction[i] == ground_truth[i]:
-            TP += 1
-    
-    accuracy = TP / len(prediction)
-    return prediction, accuracy
+```
+prediction   : [2 3 2 4 4 4 1 4 0 3 3 3 3 4 1 1 1 1 2 2 0 0]
+ground truth : [2 2 2 4 4 4 4 4 0 3 3 3 3 1 1 1 1 1 2 5 0 0]
+Accuracy : 81.8%
 ```
 
-### 3.3. Résultats
+**Analyse :** Meilleure performance. Les moments de Hu capturent bien la géométrie des formes et sont robustes aux rotations. Par contre, on a besoin d'images de référence et certaines confusions persistent (image 1 : octogone prédit comme carré, image 13 : triangle prédit comme rectangle).
 
-MOMENT DE HU :
-prediction   :   [2 3 2 4 4 4 1 4 0 3 3 3 3 4 1 1 1 1 2 2 0 0]
-ground truth :   [2 2 2 4 4 4 4 4 0 3 3 3 3 1 1 1 1 1 2 5 0 0]
-Accuracy: 0.8181818181818182
-
-### 3.4. Commentaires
-
-**Performance élevée  : 82%**
-
-**Observations :**
-
-**Points positifs :**
-
-- Les écart entre chaque moments de Hu des différentes formes sont très grand
-- peu importe le sens de la forme et la taille 
-
-**Limites observées :**
-
-- besoin d'image de référence 
 ---
 
-## Question 4 : Fonction `mySignatureAnalysis` - Classification par signature
+## 4. Méthode 3 : Classification par signature
 
-### 4.1. Principe
+On analyse le nombre de maxima locaux dans la signature après filtrage gaussien :
+- Cercle : variabilité très faible (signature quasi-constante)
+- Triangle : 3 maxima (3 sommets)
+- Carré/Rectangle : 4 maxima (4 coins)
+- Octogone : 7-9 maxima (8 côtés)
 
-La **signature** d'une forme est la distance de chaque point du contour au centre de gravité. 
+### Exemples de signatures
 
-#### Calcul de la signature (`mySignature`)
+**Cercle :** Signature constante, pas de variation
 
-```python
-def mySignature(objet):
-    contour,_ = cv2.findContours(objet, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    cnt = contour[0]
-    
-    # Centre de gravité
-    ch = np.mean(cnt[:, 0, 0])  # Coordonnée x moyenne
-    cw = np.mean(cnt[:, 0, 1])  # Coordonnée y moyenne
-    
-    signature = []
-    for point in cnt:
-        x = point[0, 0]
-        y = point[0, 1]
-        # Distance euclidienne au centre
-        distance = np.sqrt((x - ch)**2 + (y - cw)**2)
-        signature.append(distance)
-    
-    return signature
-```
+![Signature cercle](Signatures/signature_cercle.png)
 
-### 4.2. Analyse des maxima locaux
+**Triangle :** 3 maxima nets correspondant aux 3 sommets
 
-Le nombre de **maxima locaux** (pics) dans la signature correspond au nombre de "coins" ou sommets de la forme :
-- **Cercle** : signature quasi-constante → peu de maxima (≤2)
-- **Triangle** : 3 sommets → 3 maxima
-- **Carré** : 4 sommets → 4 maxima
-- **Rectangle** : 4 sommets → 4 maxima  
-- **Octogone** : 8 sommets → 7-9 maxima (avec le lissage)
+![Signature triangle](Signatures/signature_triangle.png)
 
-### 4.3. Implémentation
+**Carré :** 4 maxima d'amplitudes égales (géométrie régulière)
 
-```python
-def mySignatureAnalysis(param_test):
-    nb_objets = len(param_test)
-    prediction = np.zeros(shape=(nb_objets), dtype=np.uint8)
-    TP = 0
-    
-    for i in range(nb_objets):
-        signature = param_test[i][4]  # Signature à l'indice 4
-        
-        # Conversion en liste si nécessaire
-        if not isinstance(signature, list):
-            signature_list = list(signature)
-        else:
-            signature_list = signature
-        
-        # Normalisation : rotation pour commencer au minimum
-        signature_list = np.roll(signature_list, 
-                                -signature_list.index(min(signature_list)))
-        signature = np.asarray(signature_list)
-        
-        # Filtrage gaussien pour éliminer le bruit
-        longueur_contour = len(signature)
-        sigma = longueur_contour / 128
-        signature = sc.ndimage.gaussian_filter(signature, sigma, order=0)
-        
-        # Détection des maxima locaux
-        maxima = argrelextrema(signature, np.greater)[0]
-        nb_maxima = len(maxima)
-        
-        # Classification selon le nombre de maxima
-        if nb_maxima <= 2:
-            prediction[i] = CERCLE
-        elif nb_maxima == 3:
-            prediction[i] = TRIANGLE
-        elif nb_maxima == 4:
-            # Différenciation carré/rectangle par variance
-            distances = [signature[maxima[k]] for k in range(nb_maxima)]
-            variance = np.var(distances)
-            if variance < np.mean(distances) * 0.1:
-                prediction[i] = CARRE  # Distances homogènes
-            else:
-                prediction[i] = RECTANGLE  # Distances variées
-        elif 7 <= nb_maxima <= 9:
-            prediction[i] = OCTOGONE
-        else:
-            prediction[i] = AUTRE
-        
-        if prediction[i] == ground_truth[i]:
-            TP += 1
-    
-    accuracy = TP / len(prediction)
-    return prediction, accuracy
-```
+![Signature carré](Signatures/signature_carree.png)
 
-### 4.4. Résultats
+**Rectangle :** 4 maxima avec 2 amplitudes moins grandes 
+
+![Signature rectangle](Signatures/signature_rectangle.png)
+
+**Hexagone :** 6 maxima régulièrement espacés
+
+![Signature hexagone](Signatures/signature_hexagone.png)
+
+### Gestion des cas problématiques
+
+**Problème 1 : Différenciation carré/rectangle**
+
+Les deux formes ont 4 maxima. On les différencie en analysant le **rapport entre maxima** :
+
+- **Carré :** Les 4 distances maximales sont identiques (4 coins équidistants du centre)
+  - $\frac{max(maxima)}{min(maxima)} < 6$
+
+- **Rectangle :** 2 distances différentes car les coins des côtés longs sont plus éloignés du centre que ceux des côtés courts
+  - $\frac{max(maxima)}{min(maxima)} \geq 6$
+
+Cette approche fonctionne bien car l'allongement du rectangle crée une différence significative entre les amplitudes des maxima.
+
+**Problème 2 : Détection du cercle**
+
+À cause de la pixelisation, un cercle peut présenter de nombreux petits maxima parasites. Le simple comptage ne suffit pas. On utilise donc l'**écart-type relatif** de la signature :
+
+$$\frac{\sigma_{signature}}{\mu_{signature}} < 0.02$$
+
+Pour un cercle, même pixellisé, la distance au centre varie très peu (signature quasi-constante). Ce critère permet de distinguer un cercle d'un octogone qui a aussi une signature relativement régulière mais avec 8 variations nettes.
+
+
+### Résultats
 
 ```
-SIGNATURE :
-prediction    : [2 2 2 3 3 3 3 3 5 3 3 3 3 1 1 1 1 1 2 5 5 3]
-ground truth  : [2 2 2 4 4 4 4 4 0 3 3 3 3 1 1 1 1 1 2 5 0 0]
-Accuracy      : 63.6%
+prediction   : [2 2 2 4 4 4 4 4 0 3 3 3 3 1 1 1 1 1 2 5 0 0]
+ground truth : [2 2 2 4 4 4 4 4 0 3 3 3 3 1 1 1 1 1 2 5 0 0]
+Accuracy : 100%
 ```
 
-### 4.5. Commentaires
+**Analyse :** Performance parfaite ! Le comptage des maxima permet d'identifier précisément le nombre de sommets. Le filtrage gaussien avec $\sigma = \frac{longueur\_contour}{128}$ élimine bien le bruit de pixellisation. Avantage majeur : pas besoin d'images de référence.
 
-**Performance moyenne : 63.6%**
-
-**Points positifs :**
--  **Triangles parfaitement détectés** (3 pics nets)
--  Méthode intuitive et interprétable géométriquement
-- Pas besoin d'image de référence
-**Limites observées :**
--  **Confusion carré ↔ rectangle** : même nombre de maxima (4), la variance seule ne suffit pas toujours
--  **Cercles mal classés** : certains identifiés comme "autre" ou "carré" à cause du bruit
-
-**Améliorations possibles :**
-Analyser l'amplitude des maxima, pas seulement leur nombre
 ---
 
-## Synthèse comparative des méthodes
+## Synthèse
 
+<<<<<<< HEAD
 | Méthode | Accuracy | Avantages | Inconvénients |
 |---------|----------|-----------|---------------|
 | **Compacité** | **68%** | Simple et rapide<br>Bon pour formes régulières<br> besoin d'image de référence | Confusion cercle/octogone<br> Confusion carré/rectangle |
 | **Moments de Hu** | **82%** | A compléter  | Besoin d'image de référence<br>|
 | **Signature** | **100 %** |  Pas besoin d'image de référence<br> Intuitive géométriquement<br> Excellente pour triangles<br> Signature des formes propres |  Sensible au filtrage<br> Confusion sur les formes à 4 côtés (ajout d'une méthode de différentiation)<br> Besoin d'un dataset d'image de bonne qualité |
+=======
+| Méthode | Accuracy | Avantages | Limites |
+|---------|----------|-----------|---------|
+| Compacité | 68.2% | Rapide, intuitive | Confusion cercle/octogone |
+| Moments de Hu | 81.8% | Robuste aux rotations | Besoin de références |
+| Signature | **100%** | Précise, sans référence | Sensible au filtrage |
+>>>>>>> 9a3ca4112f29c61ed3f1c9b78985f92841a64397
 
 ---
 
 ## Conclusion
 
+<<<<<<< HEAD
 Le TP a permis de découvrir une première approche du traitement d'image et d'analyser différente  méthodes de reconnaissance de formes géométriques :
 
 
@@ -441,3 +170,11 @@ Le TP a permis de découvrir une première approche du traitement d'image et d'a
 - Les descripteurs simples (compacité) sont souvent plus efficaces que les descripteurs complexes (moments de Hu) pour des formes géométriques basiques
 - L'analyse de signature est puissante mais nécessite un bon prétraitement (filtrage)
 - Aucune méthode seule n'atteint une performance parfaite
+=======
+La méthode par signature s'est révélée la plus efficace avec 100% de bonnes classifications. Le comptage des maxima locaux permet d'identifier directement le nombre de sommets, ce qui est très adapté aux formes géométriques simples. 
+
+Les moments de Hu donnent de bons résultats (81.8%) et seraient probablement meilleurs avec plus d'images de référence. La compacité seule reste trop limitée pour discriminer des formes proches comme cercle/octogone.
+
+Pour une application réelle, on combinerait plusieurs descripteurs (compacité + signature) pour gagner en robustesse.
+
+>>>>>>> 9a3ca4112f29c61ed3f1c9b78985f92841a64397

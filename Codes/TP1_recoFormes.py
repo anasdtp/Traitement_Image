@@ -162,7 +162,7 @@ def mySignatureAnalysis(param_test):
             prediction[i] = CERCLE
         elif nb_maxima == 3:
             prediction[i] = TRIANGLE
-            print(f"Image {i} : triangle détecté, nombre de maxima = {nb_maxima}, moyenne des maxima = {np.mean(maxima)}, ecart type des maxima = {np.max(maxima)/np.min(maxima)}")
+            #print(f"Image {i} : triangle détecté, nombre de maxima = {nb_maxima}, moyenne des maxima = {np.mean(maxima)}, ecart type des maxima = {np.max(maxima)/np.min(maxima)}")
         # Carré : 4 maxima
         elif nb_maxima == 4:
             # Vérifier si c'est un carré ou un rectangle
@@ -170,18 +170,18 @@ def mySignatureAnalysis(param_test):
             ecart_type = np.max(maxima)/np.min(maxima)
             if ecart_type < 6: # Seuil à ajuster pour différencier carré et rectangle
                 prediction[i] = RECTANGLE
-                print(f"Image {i} : rectangle détecté, nombre de maxima = {nb_maxima}, moyenne des maxima = {np.mean(maxima)}, ecalrt type des maxima = {np.max(maxima)/np.min(maxima)}")
+                #print(f"Image {i} : rectangle détecté, nombre de maxima = {nb_maxima}, moyenne des maxima = {np.mean(maxima)}, ecalrt type des maxima = {np.max(maxima)/np.min(maxima)}")
             else:
                 prediction[i] = CARRE 
-                print(f"Image {i} : carré détecté, nombre de maxima = {nb_maxima}, moyenne des maxima = {np.mean(maxima)}, ecart type des maxima = {np.max(maxima)/np.min(maxima)}")  
+                #print(f"Image {i} : carré détecté, nombre de maxima = {nb_maxima}, moyenne des maxima = {np.mean(maxima)}, ecart type des maxima = {np.max(maxima)/np.min(maxima)}")  
         # Octogone : 8 maxima
         elif nb_maxima >= 7 and nb_maxima <= 9:
             prediction[i] = OCTOGONE
-            print(f"Image {i} : octogone détecté, nombre de maxima = {nb_maxima}, moyenne des maxima = {np.mean(maxima)}, ecart type des maxima = {np.max(maxima)/np.min(maxima)}")
+            #print(f"Image {i} : octogone détecté, nombre de maxima = {nb_maxima}, moyenne des maxima = {np.mean(maxima)}, ecart type des maxima = {np.max(maxima)/np.min(maxima)}")
         # Autre
         else:
             prediction[i] = AUTRE
-            print(f"Image {i} : forme non reconnue, nombre de maxima = {nb_maxima}, moyenne des maxima = {np.mean(maxima)}, ecart type des maxima = {np.max(maxima)/np.min(maxima)}, std/mean signature = {np.std(signature)/np.mean(signature)}")
+            #print(f"Image {i} : forme non reconnue, nombre de maxima = {nb_maxima}, moyenne des maxima = {np.mean(maxima)}, ecart type des maxima = {np.max(maxima)/np.min(maxima)}, std/mean signature = {np.std(signature)/np.mean(signature)}")
 
         if(prediction[i]==ground_truth[i]):
             TP+=1
@@ -196,8 +196,8 @@ myShapeAnalysis
 Recupère les paramètres de forme de l'ensemble des images et les analyse 
 """
 def myShapeAnalysis(param_test, param_ex):  
-    # myCompacityAnalysis(param_test, param_ex)
-    # myHuMomentsAnalysis(param_test, param_ex)
+    myCompacityAnalysis(param_test, param_ex)
+    myHuMomentsAnalysis(param_test, param_ex)
     mySignatureAnalysis(param_test)
 
 if __name__ == "__main__":
