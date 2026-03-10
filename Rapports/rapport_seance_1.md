@@ -1,6 +1,6 @@
 # Rapport TP1 : Reconnaissance de formes simples
-
-**Date :** 15 janvier 2026  
+![alt text](image.png)
+**Date :** 12 Février 2026  
 **Anas DAGGAG - Jeremy DOUBLET - APP5 EIE**
 
 ---
@@ -16,32 +16,36 @@ Implémenter 3 méthodes de reconnaissance automatique de formes géométriques 
 
 ---
 
-## 1. Calcul des paramètres de forme
+## Exo 1.1 : compacité
 
-On a implémenté la fonction `myShapeCompute` qui extrait plusieurs descripteurs :
+### **Function myShapeCompute (dans shape.py)**
+**Elle prend en entrée la forme à reconnaître et calcule plusieurs paramètres. Ajouter les différents paramètres suivants :**
 
-**Aire :** Nombre de pixels de l'objet (directement dans `stats[4]`)
+**- aire : compter le nombre de pixels de l'objet**
 
-**Périmètre :** Calculé via le code de Freeman
-- Code de Freeman : encode les 8 directions possibles entre points consécutifs du contour
-- On convertit ensuite en distance : 1 pour horizontal/vertical, √2 pour diagonal
+L'aire est obtenue dans `stats[4]`.
 
-**Périmètre :** Calculé via le code de Freeman
-- Code de Freeman : encode les 8 directions possibles entre points consécutifs du contour
-- On convertit ensuite en distance : 1 pour horizontal/vertical, √2 pour diagonal
+**- périmètre : longueur du contour**
+  - **compléter myFreemanCode pour déduire le code de Freeman de la forme à partir de la chaîne du contour obtenue par cv2.findContours**
+  - **compléter myPerimeter pour en déduire le périmètre**
 
-**Compacité :** $C = \frac{4\pi A}{P^2}$ où A=aire, P=périmètre
-- Proche de 1 pour un cercle, diminue pour les formes allongées
+Le code de Freeman encode les 8 directions possibles entre points consécutifs du contour. Pour chaque point, on calcule le vecteur `d=[dx,dy]` vers le point suivant, puis on normalise à -1, 0, ou 1, et on utilise la matrice Freeman pour obtenir la direction (0 à 7).
 
-**Signature :** Distance de chaque point du contour au centre de gravité
+Le périmètre se calcule ensuite en sommant les distances : 1 pour les directions horizontales/verticales (paires : 0,2,4,6), et √2 pour les diagonales (impaires : 1,3,5,7).
 
-**Moments de Hu :** 7 invariants géométriques (rotation, translation, échelle)
+**- en déduire la compacité et vérifier qu'elle est maximale pour les ronds**
+
+La compacité est calculée par : $C = \frac{4\pi A}{P^2}$ où A=aire, P=périmètre.
+
+Elle est proche de 1 pour un cercle (forme la plus compacte) et diminue pour les formes allongées.
 
 ---
 
-## 2. Méthode 1 : Classification par compacité
-
-On compare la compacité de chaque image test avec les 5 références et on prédit la classe la plus proche.
+### **Function myCompacityAnalysis(param_test, param_ex)**
+**Compléter la fonction pour qu'elle :**
+- **compare la compacité de chaque forme (param_test) avec celles des exemples (param_ex)**
+- **renvoie la catégorie pour chaque forme (0 :cercle, 1 : triangle, 2 : octogone, 3 : carré, 4 : rectangle)**
+- **Commenter les résultats obtenus.**
 
 ### Résultats
 
@@ -51,19 +55,37 @@ ground truth : [2 2 2 4 4 4 4 4 0 3 3 3 3 1 1 1 1 1 2 5 0 0]
 Accuracy : 68.2%
 ```
 
+Rappel :
+```
+CERCLE=0
+TRIANGLE=1
+OCTOGONE=2
+CARRE=3
+RECTANGLE =4
+AUTRE=5
+```
+
 Valeurs observées :
 - Cercles/Octogones : 0.90-0.95 → confusion fréquente
 - Carrés : ~0.70-0.80
 - Rectangles : ~0.50-0.70  
 - Triangles : ~0.50-0.55
 
-**Analyse :** Méthode simple mais limitée. Les octogones ressemblent trop aux cercles (forme régulière). Difficile aussi de distinguer carrés des rectangles selon leur orientation.
+**-** Les octogones ressemblent trop aux cercles. Difficile de distinguer carrés des rectangles.
 
 ---
 
-## 3. Méthode 2 : Classification par moments de Hu
+## Exo 1.2 : moments de Hu
 
-On calcule la distance euclidienne entre les 7 moments de Hu de l'image test et ceux des références.
+### **Calcul des moments de Hu**
+**Dans la fonction myShapeCompute (dans shape.py), rajouter le calcul des moments de Hu (en utilisant les fonctions d'opencv)**
+
+
+### **Function myHuMomentsAnalysis(param_test, param_ex)**
+**Compléter la fonction pour qu'elle :**
+- **compare les 7 moments de Hu d'une forme (param_test) avec ceux des formes exemples (param_ex)**
+- **renvoie la catégorie de la forme**
+- **Commenter les résultats obtenus.**
 
 ### Résultats
 
@@ -73,13 +95,19 @@ ground truth : [2 2 2 4 4 4 4 4 0 3 3 3 3 1 1 1 1 1 2 5 0 0]
 Accuracy : 81.8%
 ```
 
-**Analyse :** Meilleure performance. Les moments de Hu capturent bien la géométrie des formes et sont robustes aux rotations. Par contre, on a besoin d'images de référence et certaines confusions persistent (image 1 : octogone prédit comme carré, image 13 : triangle prédit comme rectangle).
+**-** Meilleure performance. Les moments de Hu capturent bien la géométrie des formes et sont robustes aux rotations. Par contre, on a besoin d'images de référence et certaines confusions persistent (octogone prédit comme carré, triangle prédit comme rectangle).
 
 ---
 
-## 4. Méthode 3 : Classification par signature
+## Exo 1.3 : signature
 
-On analyse le nombre de maxima locaux dans la signature après filtrage gaussien :
+### **Function mySignature**
+**Compléter la fonction pour qu'elle renvoie la signature de l'objet**
+
+### **Function mySignatureAnalysis(param_test)**
+**- Mettre à jour la fonction pour qu'elle analyse la signature et en déduise la classe de chaque forme**
+**- Commenter les résultats**
+
 - Cercle : variabilité très faible (signature quasi-constante)
 - Triangle : 3 maxima (3 sommets)
 - Carré/Rectangle : 4 maxima (4 coins)
@@ -138,25 +166,22 @@ ground truth : [2 2 2 4 4 4 4 4 0 3 3 3 3 1 1 1 1 1 2 5 0 0]
 Accuracy : 100%
 ```
 
-**Analyse :** Performance parfaite ! Le comptage des maxima permet d'identifier précisément le nombre de sommets. Le filtrage gaussien avec $\sigma = \frac{longueur\_contour}{128}$ élimine bien le bruit de pixellisation. Avantage majeur : pas besoin d'images de référence.
+**-** Performance parfaite. Le comptage des maxima permet d'identifier précisément le nombre de sommets. Le filtrage gaussien avec $\sigma = \frac{longueur\_contour}{128}$ élimine bien le bruit de pixellisation. Avantage majeur : pas besoin d'images de référence.
 
 ---
 
 ## Synthèse
 
-| Méthode | Accuracy | Avantages | Limites |
-|---------|----------|-----------|---------|
-| Compacité | 68.2% | Rapide, intuitive | Confusion cercle/octogone |
-| Moments de Hu | 81.8% | Robuste aux rotations | Besoin de références |
-| Signature | **100%** | Précise, sans référence | Sensible au filtrage |
+| Méthode | Accuracy | Avantages | Inconvénients |
+|---------|----------|-----------|---------------|
+| **Compacité** | **68%** | Simple et rapide<br>Bon pour formes régulières<br> besoin d'image de référence | Confusion cercle/octogone<br> Confusion carré/rectangle |
+| **Moments de Hu** | **82%** | A compléter  | Besoin d'image de référence<br>|
+| **Signature** | **100 %** |  Pas besoin d'image de référence<br> Intuitive géométriquement<br> Excellente pour triangles<br> Signature des formes propres |  Sensible au filtrage<br> Confusion sur les formes à 4 côtés (ajout d'une méthode de différentiation)<br> Besoin d'un dataset d'image de bonne qualité |
 
 ---
 
 ## Conclusion
 
-La méthode par signature s'est révélée la plus efficace avec 100% de bonnes classifications. Le comptage des maxima locaux permet d'identifier directement le nombre de sommets, ce qui est très adapté aux formes géométriques simples. 
-
-Les moments de Hu donnent de bons résultats (81.8%) et seraient probablement meilleurs avec plus d'images de référence. La compacité seule reste trop limitée pour discriminer des formes proches comme cercle/octogone.
-
-Pour une application réelle, on combinerait plusieurs descripteurs (compacité + signature) pour gagner en robustesse.
-
+- Les descripteurs simples (compacité) sont souvent plus efficaces que les descripteurs complexes (moments de Hu) pour des formes géométriques basiques
+- L'analyse de signature est puissante mais nécessite un bon prétraitement (filtrage)
+- Aucune méthode seule n'atteint une performance parfaite
