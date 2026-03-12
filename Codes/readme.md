@@ -1,0 +1,1 @@
+Téléchargement de scipy au besoin : <https://pypi.org/project/scipy/> ; <https://scipy.org/install/>
