@@ -158,7 +158,7 @@ def mySignatureAnalysis(param_test):
         nb_maxima = len(maxima)
         
         # Triangle : 3 maxima
-        if (np.std(signature)/np.mean(signature)) < 0.02:
+        if (np.var(signature)) < 10:
             prediction[i] = CERCLE
         elif nb_maxima == 3:
             prediction[i] = TRIANGLE
@@ -196,8 +196,8 @@ myShapeAnalysis
 Recupère les paramètres de forme de l'ensemble des images et les analyse 
 """
 def myShapeAnalysis(param_test, param_ex):  
-    myCompacityAnalysis(param_test, param_ex)
-    myHuMomentsAnalysis(param_test, param_ex)
+    # myCompacityAnalysis(param_test, param_ex)
+    # myHuMomentsAnalysis(param_test, param_ex)
     mySignatureAnalysis(param_test)
 
 if __name__ == "__main__":
