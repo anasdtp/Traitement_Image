@@ -187,3 +187,21 @@ Accuracy : 100%
 - Les descripteurs simples (compacité) sont souvent plus efficaces que les descripteurs complexes (moments de Hu) pour des formes géométriques basiques
 - L'analyse de signature est puissante mais nécessite un bon prétraitement (filtrage)
 - Aucune méthode seule n'atteint une performance parfaite
+
+
+# Rapport TP1 partie 2 : Reconnaissance de panneaux 
+
+- La deuxième partie consiste à reconnaitre les formes d'un dataset d'images 
+
+
+La première partie à été de comprendre comment le code de binarisation des panneaux fonctionne puis d'appliquer la méthode de reconnaissance de formes à la binarisation de l'image. 
+
+La problèmatique rencontré est la mauvaise binarisation de l'image, des artéfacts qui ne font pas partie du panneau s'affiche et la fonction de reconnaissance de forme esssaie d'associer une image au différentes artéfacts générer
+
+
+![alt text](image-6.png)
+ 
+Exemple sur cette image en dessous de l'exagone, la fonction signature analyse un octogone et 2 triangles
+cercles :  0 triangles:  2 octo:  1
+
+Pour améliorer le traitement il faudrait améliorer d'abord le traitement de la binairisation pour pouvoir faire un traitement plus facile avec la signature

@@ -74,14 +74,14 @@ def mySignatureAnalysis(param):
         sigma=longueur_contour/128
         signature=sc.ndimage.gaussian_filter(signature, sigma, order=0)
         
-        plt.plot(signature)
-        plt.ylabel('some numbers')
-        plt.show()  
+        #plt.plot(signature)
+        #plt.ylabel('some numbers')
+        #plt.show()  
         
         # Trouver les maxima locaux de la signature
         maxima = argrelextrema(signature, np.greater)[0]
         nb_maxima = len(maxima)
-        print("nb maxima : ", maxima)
+        #print("nb maxima : ", maxima)
         # Cercle : peu de maxima (signature régulière)
         if nb_maxima <= 2:
             nb_cercles += 1
