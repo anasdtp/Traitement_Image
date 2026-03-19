@@ -28,8 +28,8 @@ def background_subtract(background, image, thres):
     image = np.asarray(image, np.float32)
     background = np.asarray(background, np.float32)
 
-    # EFFACER ET COMPLETER
-    b=np.asanyarray(image, np.uint8)
+    diff = np.abs(image - background)
+    b = np.where(diff > float(thres), 255, 0).astype(np.uint8)
 
     return(b)
 
@@ -43,8 +43,15 @@ Normalisation photométrique
 ---------------------------------------------------------
 """
 def photometric_normalization(image):
-    # EFFACER ET COMPLETER
-    norm_image=np.asanyarray(image, np.uint8)
+    im = np.asarray(image, np.float32)
+    mu = float(np.mean(im))
+    sigma = float(np.std(im))
+    sigma = max(sigma, 1e-6)
+
+    # Normalisation puis remise dans une dynamique 8 bits exploitable.
+    z = (im - mu) / sigma
+    z = cv2.normalize(z, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)
+    norm_image = z.astype(np.uint8)
     return(norm_image)
 
 
@@ -60,8 +67,10 @@ def update_beackground_mean(background, image, alpha):
     image = np.asarray(image, np.float32)
     background = np.asarray(background, np.float32)
 
-    # EFFACER ET COMPLETER
-    res=np.asanyarray(background, np.uint8)
+    alpha = float(np.clip(alpha, 0.0, 1.0))
+    # Bt = alpha * B(t-1) + (1-alpha) * It
+    res = alpha * background + (1.0 - alpha) * image
+    res = np.clip(res, 0, 255).astype(np.uint8)
     return(res)
 
 
