@@ -19,17 +19,22 @@ def display(titre, im):
 Simple Background Subraction  :
 - Bt : background image
 - It : current image
+- thres = seuil
 - filter = 0(resp. 1) without (resp with) morphological filtering
 ---------------------------------------------------------
 """
 def background_subtract(background, image, thres):
-    # convertir image / background en np.asarray (np.float32)
-    
+    # convertir image / background (fond) en np.asarray (np.float32)
+    image = np.asarray(image, np.float32)
+    background = np.asarray(background, np.float32)
+
     # EFFACER ET COMPLETER
     b=np.asanyarray(image, np.uint8)
 
     return(b)
 
+
+#TODO : exercice 2
 """ -------------------------------------------------------
 Normalisation photométrique
 - Bt : background image
@@ -37,22 +42,24 @@ Normalisation photométrique
 - filter = 0(resp. 1) without (resp with) morphological filtering
 ---------------------------------------------------------
 """
-
-
-#TODO : exercice 2
 def photometric_normalization(image):
     # EFFACER ET COMPLETER
     norm_image=np.asanyarray(image, np.uint8)
     return(norm_image)
 
+
+
+#TODO : exercice 3
 """ -------------------------------------------------------
 Background update using a temporal mean
 - background : image of the current background
 - image : current image of the video
 ---------------------------------------------------------"""
-#TODO : exercice 3
 def update_beackground_mean(background, image, alpha):
-   
+    
+    image = np.asarray(image, np.float32)
+    background = np.asarray(background, np.float32)
+
     # EFFACER ET COMPLETER
     res=np.asanyarray(background, np.uint8)
     return(res)
@@ -64,7 +71,6 @@ Background update using a median value of N images
 - background : image of the current background
 - im_list : list image
 ---------------------------------------------------------"""
-
 def update_beackground_median(im_list):
     n= len(im_list)
     print(n)
