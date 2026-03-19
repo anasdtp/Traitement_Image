@@ -225,6 +225,40 @@ Performance parfaite. Le comptage des maxima identifie precisement le nombre de 
   [Sensible au choix du filtrage ; necessite un bon pretraitement ; parametre $sigma$ a ajuster selon la taille du contour.],
 )
 
+== Rapport TP1 partie 2 : Reconnaissance de panneaux
+
+La deuxieme partie consiste a reconnaitre les formes sur un dataset d'images de panneaux.
+
+La premiere etape a ete de comprendre la chaine de binarisation des panneaux, puis d'appliquer la methode de reconnaissance de formes sur l'image binaire.
+
+Probleme principal rencontre : la binarisation genere des artefacts qui ne font pas partie du panneau. La fonction de signature essaye alors d'associer une classe a ces objets parasites, ce qui fausse le comptage final.
+
+#figure(
+  image("image-6.png", width: 70%),
+  caption: [Exemple de panneau avec detections parasites]
+)
+
+Exemple observe : sur l'image ci-dessus, sous l'hexagone, la fonction signature detecte un octogone et deux triangles.
+
+```txt
+cercles : 0
+triangles : 2
+octo : 1
+```
+
+Pour ameliorer les resultats, il faut d'abord ameliorer la binarisation afin de supprimer les artefacts en amont. La reconnaissance par signature devient alors plus robuste.
+
+
+#figure(
+  image("Capture_ecran_TP1_RecoFormes/panneau_debug_im06.png", width: 90%),
+  caption: [Debug image 06 : source, binarisation, objets retenus et signatures]
+)
+
+#figure(
+  image("Capture_ecran_TP1_RecoFormes/panneaux_comptage_vs_gt.png", width: 90%),
+  caption: [Comptage des formes : predictions vs verite terrain]
+)
+
 == Conclusion
 
 - Les descripteurs simples (compacite) restent efficaces pour des formes geometriques basiques.
