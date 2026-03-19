@@ -191,8 +191,9 @@ Accuracy : 100%
 
 # Rapport TP1 partie 2 : Reconnaissance de panneaux 
 
-- La deuxième partie consiste à reconnaitre les formes d'un dataset d'images 
+- La deuxième partie consiste à reconnaitre les formes d'un dataset d'images de panneaux
 
+![alt text](image-7.png)
 
 La première partie à été de comprendre comment le code de binarisation des panneaux fonctionne puis d'appliquer la méthode de reconnaissance de formes à la binarisation de l'image. 
 
