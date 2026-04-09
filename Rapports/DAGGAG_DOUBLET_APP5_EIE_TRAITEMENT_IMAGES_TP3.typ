@@ -146,9 +146,62 @@ Fichiers principaux :
 - `tp3_mean_optical_flow.png`,
 - `tp3_summary.csv`.
 
+
+
+Pour essayer la detection sur d'autres modèle il faut maintenant jouer sur les valeurs de : THRESHOLD = 10
+ALPHA_BG = 0.7
+MIN_AREA = 100
+
+Voici le résultat pour les autres vidéo : 
+Vidéo lego 
+
+#image("/assets/image-2.png")
+
+THRESHOLD = 20
+ALPHA_BG = 0.2
+MIN_AREA = 10
+MAX_FRAMES = 260
+
+
+Cette vidéo est très difficile à analyser car les couleurs se raproche beaucoup et la vidéo est très courte 
+
+Vidéo rouen 
+
+#image("/assets/image-3.png")
+
+J'ai trouvé cette image intéréssante car nous pouvons voir que le réglage du paramètre pour retiré les ombres est très important, sur l'image ont peut voir que les ombre du véicule sont considéré comme du mouvement 
+
+Vidéo sheerbrooke 
+
+#image("/assets/image-4.png")
+
+
+Cette vidéo est très facile à analyser car les couleurs sont très différentes et la vidéo est de bonne qualité (très bonne luminosité)
+
+THRESHOLD = 10
+ALPHA_BG = 0.5
+MIN_AREA = 10
+MAX_FRAMES = 260
+
+Vidéo stmarc_video
+
+#image("/assets/image-5.png")
+
+Sur cette vidéo l'élement interessant est l'arbre, ont peut voir que les feuilles sont considéré comme du mouvement 
+
+#image("/assets/image-6.png")
+
+THRESHOLD = 20
+ALPHA_BG = 0.2
+MIN_AREA = 10
+MAX_FRAMES = 260
+
+Avec ces paramètre nous arrivons à retirer les bruits des feuilles de l'abre ce qui montre vraiment l'importance du choix des paramètre de filtrage 
+
 == Conclusion
 
 - La soustraction de fond simple fonctionne mais est sensible a l'eclairage et au bruit.
 - La normalisation photometrique et la mise a jour temporelle du fond ameliorent la robustesse.
 - La morphologie est essentielle pour stabiliser le comptage d'objets.
 - Le flot optique moyen par composante apporte une information dynamique utile pour qualifier le mouvement, au-dela d'une simple detection binaire.
+- Pour une détection la plus optimal le choix des paramètre est très important et influx énormément en fonction de la vidéo traité 
