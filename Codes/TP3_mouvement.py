@@ -18,9 +18,9 @@ VIDEO_PATH = BASE_DIR / "im" / "Video" / "campus.mp4"
 OUT_DIR = BASE_DIR / "Rapports" / "Capture_ecran_TP3_Mouvement"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-SHOW_WINDOWS = False
+SHOW_WINDOWS = True
 USE_PHOTOMETRIC_NORMALIZATION = True
-THRESHOLD = 20
+THRESHOLD = 50
 ALPHA_BG = 0.8
 MIN_AREA = 120
 MAX_FRAMES = 260
