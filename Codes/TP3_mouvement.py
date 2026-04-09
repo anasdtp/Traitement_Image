@@ -18,7 +18,7 @@ VIDEO_PATH = BASE_DIR / "im" / "Video" / "campus.mp4"
 OUT_DIR = BASE_DIR / "Rapports" / "Capture_ecran_TP3_Mouvement"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-SHOW_WINDOWS = False
+SHOW_WINDOWS = True
 USE_PHOTOMETRIC_NORMALIZATION = True
 THRESHOLD = 20
 ALPHA_BG = 0.8
@@ -46,14 +46,12 @@ frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY )
 if USE_PHOTOMETRIC_NORMALIZATION:
     frame = motion.photometric_normalization(frame)
 
-
 my_h, my_w = frame.shape[0], frame.shape[1]
 scale_percent =100
 width = int(frame.shape[1] * scale_percent / 100)
 height = int(frame.shape[0] * scale_percent / 100)
 dim = (width, height)
 im = cv2.resize(frame, dim, interpolation = cv2.INTER_AREA)
-
 
 background = np.asanyarray(im, np.uint8)
 foreground = np.asanyarray(im, np.uint8)
@@ -64,7 +62,6 @@ counts_raw=[]
 counts_filtered=[]
 mean_flow_per_frame=[]
 k=0
-
 
 def compute_optical_flow(prev_im, curr_im, mask, regions_map, stats, min_area=120):
     flow = cv2.calcOpticalFlowFarneback(
