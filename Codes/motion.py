@@ -13,7 +13,6 @@ def display(titre, im):
     #cv2.Convert(im, m)
     cv2.imshow(titre, m)
 
-
 #TODO : exercice 1
 """ -------------------------------------------------------
 Simple Background Subraction  :
@@ -32,7 +31,6 @@ def background_subtract(background, image, thres):
     b = np.where(diff > float(thres), 255, 0).astype(np.uint8)
 
     return(b)
-
 
 #TODO : exercice 2
 """ -------------------------------------------------------
@@ -99,13 +97,6 @@ def update_beackground_median(im_list):
                 val[:,2] =np.sort(val[:,2])
                 res[i,j]=val[int(n/2)] 
     return(res)
-
-
-
-
-
-
-
 """ -------------------------------------------------------
 Detection d'objets passant dans une zone rectangulaire
 - objets : images de composantes connexes (objets en mouvement)
