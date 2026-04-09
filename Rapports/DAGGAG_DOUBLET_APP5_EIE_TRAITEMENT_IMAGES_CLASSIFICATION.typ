@@ -46,14 +46,13 @@ Role de `model.fit` :
 - mettre a jour les poids,
 - retourner l'historique (`loss`, `accuracy`, etc.) pour l'analyse.
 
+Le modèle MLP (Multi-Layer Perceptron) est un réseau de neurones entièrement connecté, dans lequel chaque neurone d’une couche est relié à tous les neurones de la couche suivante. Dans ce cas, l’image 28×28 est d’abord aplatie en un vecteur 1D de 784 valeurs grâce à la couche Flatten, puis traitée par plusieurs couches Dense. Ce type de modèle est simple et efficace, mais il ne prend pas en compte la structure spatiale de l’image.
+
+
 === 3) Training et evolution de la loss
 
 On observe une baisse progressive de la loss sur les premieres epoques, ce qui signifie que le modele apprend des representations plus discriminantes.
 
-#figure(
-  image("Capture_ecran_TP2_Classification/loss_mlp_baseline.png", width: 88%),
-  caption: [Evolution de la loss - MLP baseline]
-)
 
 === 4) Accuracy sur la base de test
 
@@ -76,32 +75,20 @@ Configurations comparees :
 - reseau plus profond: ajout d'une couche dense de 64 neurones,
 - CNN baseline (Exo 2).
 
-#figure(
-  image("Capture_ecran_TP2_Classification/tp2_accuracy_comparison.png", width: 92%),
-  caption: [Comparaison des accuracies test]
-)
-
-#figure(
-  image("Capture_ecran_TP2_Classification/tp2_time_comparison.png", width: 92%),
-  caption: [Comparaison des temps d'entrainement]
-)
 
 Lecture des resultats :
 - *Learning rate = 0.1* degrade fortement la stabilite et l'accuracy (53.07%).
 - *Batch size = 1000* accelere l'entrainement mais penalise la performance (71.73%).
 - *MLP plus profond* apporte un leger gain (83.90%).
 
-== Exo 2 : Classification par CNN
-
-Le CNN utilise :
-- 1 couche `Conv2D(32, 3x3, relu)`,
-- 1 couche `MaxPooling2D(2x2)`,
-- 1 couche `Flatten`,
-- 1 couche dense de sortie (10 logits).
+le CNN (Convolutional Neural Network) est spécialement conçu pour le traitement d’images. Il utilise des couches de convolution (Conv2D) qui détectent automatiquement des motifs locaux comme les bords, formes ou textures, suivies de couches de pooling (MaxPooling2D) qui réduisent la taille des données tout en conservant les informations importantes. Ainsi, le CNN exploite mieux l’organisation des pixels dans l’image et offre généralement de meilleures performances que le MLP pour la classification d’images.
 
 Sur la meme execution rapide, le CNN atteint 83.70% d'accuracy, avec un temps d'entrainement un peu superieur au MLP.
 
 === Tableau de synthese
+
+
+Différent test ont été réalisé pour comparer le fonctionnement des modèles #image("/assets/image.png")
 
 #table(
   columns: (1.7fr, 1fr, 1fr, 1fr),
@@ -115,32 +102,19 @@ Sur la meme execution rapide, le CNN atteint 83.70% d'accuracy, avec un temps d'
   [MLP lr = 0.1], [53.07%], [1.1105], [1.04],
   [MLP batch = 1000], [71.73%], [0.7624], [0.80],
   [MLP plus profond], [83.90%], [0.4828], [1.37],
-  [CNN baseline], [83.70%], [0.4667], [1.61],
+  [CNN], [83.70%], [0.4667], [1.61],
 )
-
-== Code ajoute / ameliore
-
-Un script dedie a ete ajoute pour automatiser les experiences TP2 :
-
-```txt
-Codes/TP2_classification_experiments.py
-```
-
-Fonctions principales ajoutees :
-- entrainement reproductible de plusieurs configurations,
-- export automatique des courbes de loss,
-- export des comparatifs accuracy/temps,
-- export d'un fichier CSV de synthese.
-
-Les figures du present rapport proviennent de :
-
-```txt
-Rapports/Capture_ecran_TP2_Classification/
-```
 
 == Conclusion
 
 - Le MLP baseline donne deja une bonne base de performance.
 - Un learning rate trop grand degrade fortement l'apprentissage.
 - Augmenter le batch size peut reduire le temps, mais peut nuire a la qualite.
-- Le CNN est competitif et plus adapte aux donnees image, surtout avec plus d'epoques.
+- Le CNN fonctionne mieux et est plus adapté avec beaucoup d'image et avec plus d'epoques.
+
+
+Nous pouvons voir aussi que le modèle donne toujours des mauvais résultat et donc qu'il faut quand même vérifier les résultat. 
+
+#image("/assets/image-1.png")
+ 
+Dans ce cas le modèle confond la classe du sac au lieux de la classe sneaker

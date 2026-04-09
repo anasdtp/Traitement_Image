@@ -14,19 +14,19 @@ from pathlib import Path
 import motion
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-VIDEO_PATH = BASE_DIR / "im" / "Video" / "campus.mp4"
+VIDEO_PATH = BASE_DIR / "im" / "Video" / "stmarc_video.avi"
 OUT_DIR = BASE_DIR / "Rapports" / "Capture_ecran_TP3_Mouvement"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 SHOW_WINDOWS = True
 USE_PHOTOMETRIC_NORMALIZATION = True
 THRESHOLD = 20
-ALPHA_BG = 0.8
-MIN_AREA = 120
+ALPHA_BG = 0.2
+MIN_AREA = 10
 MAX_FRAMES = 260
 
 # Frames a exporter pour le rapport
-SNAPSHOT_FRAMES = {30, 120, 220}
+SNAPSHOT_FRAMES = {10, 20, 30,60, 120}
 
 cap = cv2.VideoCapture(str(VIDEO_PATH))
 if not cap.isOpened():
