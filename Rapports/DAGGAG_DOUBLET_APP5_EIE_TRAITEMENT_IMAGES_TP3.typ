@@ -64,10 +64,6 @@ Cette normalisation compense principalement :
 
 Limite : en cas de changements non-uniformes d'eclairage (ombres locales), cette approche est insuffisante.
 
-Solution possible (non implementee) :
-- utiliser une normalisation locale (CLAHE),
-- ou des modeles adaptatifs de fond (MOG2/KNN).
-
 == Exo 3 : Mise a jour du fond
 
 Formule moyenne sur $N$ images :

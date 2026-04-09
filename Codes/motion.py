@@ -112,20 +112,3 @@ def objects_entering_exiting(objects, r):
     # image = cv2.rectangle(image, start_point, end_point, color, thickness)
     # bord = 
     return(nb_in, nb_out)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -46,14 +46,12 @@ frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY )
 if USE_PHOTOMETRIC_NORMALIZATION:
     frame = motion.photometric_normalization(frame)
 
-
 my_h, my_w = frame.shape[0], frame.shape[1]
 scale_percent =100
 width = int(frame.shape[1] * scale_percent / 100)
 height = int(frame.shape[0] * scale_percent / 100)
 dim = (width, height)
 im = cv2.resize(frame, dim, interpolation = cv2.INTER_AREA)
-
 
 background = np.asanyarray(im, np.uint8)
 foreground = np.asanyarray(im, np.uint8)
@@ -64,7 +62,6 @@ counts_raw=[]
 counts_filtered=[]
 mean_flow_per_frame=[]
 k=0
-
 
 def compute_optical_flow(prev_im, curr_im, mask, regions_map, stats, min_area=120):
     flow = cv2.calcOpticalFlowFarneback(
