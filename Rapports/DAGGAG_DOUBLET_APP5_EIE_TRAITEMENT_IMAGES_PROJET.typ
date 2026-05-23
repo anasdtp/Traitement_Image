@@ -165,6 +165,6 @@ Perspectives :
 == Annexe : fichiers principaux
 
 ```txt
-Projet/Projet_panneaux_functionnel.ipynb
+Projet/Projet_panneaux.ipynb
 Rapports/DAGGAG_DOUBLET_APP5_EIE_TRAITEMENT_IMAGES_PROJET.typ
 ```

@@ -4,10 +4,7 @@
 
 = Rapport TP1 : Reconnaissance de formes simples
 
-#figure(
-  image("image.png", width: 100%),
-  caption: [Jeu d'images utilise pour la reconnaissance]
-)
+#image("/assets/image-1.png", width: 20%)
 
 *Date :* 12 Fevrier 2026\
 *Anas DAGGAG - Jeremy DOUBLET - APP5 EIE*
