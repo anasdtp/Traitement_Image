@@ -23,8 +23,8 @@ Remarque : un mode fallback existe avec un petit jeu local et des pseudo-labels 
 - Reseau pre-entraine sur ImageNet, adapte a GTSRB.
 
 ## Resultats principaux (GTSRB complet)
-- CNN maison (avant fine-tuning) : ~0.878 d'accuracy test.
-- CNN maison apres fine-tuning : ~0.914 d'accuracy test.
+- CNN maison (avant fine-tuning) : ~0.9146 d'accuracy test.
+- CNN maison apres fine-tuning : ~0.9217 d'accuracy test.
 
 Le fine-tuning consiste a continuer l'entrainement avec un taux d'apprentissage plus faible pour affiner les poids.
 
@@ -34,13 +34,10 @@ Le fine-tuning consiste a continuer l'entrainement avec un taux d'apprentissage 
 - Le fine-tuning apporte un gain net pour depasser 90%.
 
 ## Instructions d'execution
-1) Ouvrir le notebook : Projet_panneaux_functionnel.ipynb
+1) Ouvrir le notebook : Projet_panneaux.ipynb
 2) Lancer les cellules dans l'ordre
 3) Verifier la cellule finale d'evaluation pour l'accuracy test
 
 ## Limites
 - Temps d'entrainement assez long sur CPU.
 - Les performances chutent si on n'utilise pas le GTSRB complet.
-
-## Conclusion
-L'objectif de 90% d'accuracy a ete atteint sur le GTSRB complet grace a un CNN avec augmentation et fine-tuning. Le pipeline est reproductible via le notebook fourni.
